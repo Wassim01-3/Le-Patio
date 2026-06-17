@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, UtensilsCrossed, Compass, Images, Calendar, Star, Phone } from "lucide-react";
+import { Home, UtensilsCrossed, Compass, Clef, Images, Calendar, Star, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { useI18n } from "@/i18n/I18nProvider";
 
@@ -11,6 +11,7 @@ export function BottomNav() {
     { to: "/", label: t("nav.home"), icon: Home },
     { to: "/menu", label: t("nav.menu"), icon: UtensilsCrossed },
     { to: "/explore", label: t("nav.explore"), icon: Compass },
+    { to: "/songs", label: t("nav.songs"), icon: Clef },
     { to: "/gallery", label: t("nav.gallery"), icon: Images },
     { to: "/events", label: t("nav.events"), icon: Calendar },
     { to: "/reviews", label: t("nav.reviews"), icon: Star },
