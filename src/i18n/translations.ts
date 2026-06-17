@@ -19,6 +19,7 @@ export const T: Record<Lang, Dict> = {
     "nav.home": "Accueil",
     "nav.menu": "Menu",
     "nav.explore": "Explorer",
+    "nav.songs": "Musique",
     "nav.gallery": "Galerie",
     "nav.events": "Événements",
     "nav.reviews": "Avis",
@@ -170,6 +171,14 @@ export const T: Record<Lang, Dict> = {
     "contact.open": "Ouvert",
     "contact.openValue": "Tous les jours · 08h00 — 01h00",
     "contact.reserve": "Réservez votre table",
+
+    "songs.eyebrow": "Playlist",
+    "songs.title": "Jukebox Le Patio",
+    "songs.subtitle": "Choisissez vos morceaux préférés et ajoutez-les à la file d'attente du café.",
+    "songs.searchPlaceholder": "Rechercher une chanson, un artiste...",
+    "songs.queueTitle": "File d'attente actuelle",
+    "songs.emptyQueue": "La file d'attente est vide. Ajoutez la première chanson !",
+    "songs.addedToast": "Chanson ajoutée à la file d'attente !",
   },
 
   en: {
@@ -180,6 +189,7 @@ export const T: Record<Lang, Dict> = {
     "nav.home": "Home",
     "nav.menu": "Menu",
     "nav.explore": "Explore",
+    "nav.songs": "Songs",
     "nav.gallery": "Gallery",
     "nav.events": "Events",
     "nav.reviews": "Reviews",
@@ -331,6 +341,14 @@ export const T: Record<Lang, Dict> = {
     "contact.open": "Open",
     "contact.openValue": "Every day · 08:00 — 01:00",
     "contact.reserve": "Reserve Your Table",
+
+    "songs.eyebrow": "Playlist",
+    "songs.title": "Le Patio Jukebox",
+    "songs.subtitle": "Choose your favorite tracks and add them to the café's queue.",
+    "songs.searchPlaceholder": "Search for a song, artist...",
+    "songs.queueTitle": "Current Queue",
+    "songs.emptyQueue": "The queue is empty. Add the first song!",
+    "songs.addedToast": "Song added to the queue!",
   },
 
   ar: {
@@ -341,6 +359,7 @@ export const T: Record<Lang, Dict> = {
     "nav.home": "الرئيسية",
     "nav.menu": "القائمة",
     "nav.explore": "استكشف",
+    "nav.songs": "الأغاني",
     "nav.gallery": "المعرض",
     "nav.events": "الفعاليات",
     "nav.reviews": "آراء الزوار",
@@ -492,6 +511,14 @@ export const T: Record<Lang, Dict> = {
     "contact.open": "ساعات العمل",
     "contact.openValue": "كل يوم · 08:00 — 01:00",
     "contact.reserve": "احجز طاولتك",
+
+    "songs.eyebrow": "قائمة الأغاني",
+    "songs.title": "جوك بوكس لو باتيو",
+    "songs.subtitle": "اختر أغانيك المفضلة وأضفها إلى قائمة الانتظار بالمقهى.",
+    "songs.searchPlaceholder": "ابحث عن أغنية، فنان...",
+    "songs.queueTitle": "قائمة الانتظار الحالية",
+    "songs.emptyQueue": "قائمة الانتظار فارغة. أضف الأغنية الأولى!",
+    "songs.addedToast": "تم إضافة الأغنية لقائمة الانتظار!",
   },
 
   de: {
@@ -502,6 +529,7 @@ export const T: Record<Lang, Dict> = {
     "nav.home": "Start",
     "nav.menu": "Karte",
     "nav.explore": "Entdecken",
+    "nav.songs": "Musik",
     "nav.gallery": "Galerie",
     "nav.events": "Events",
     "nav.reviews": "Bewertungen",
@@ -653,6 +681,14 @@ export const T: Record<Lang, Dict> = {
     "contact.open": "Geöffnet",
     "contact.openValue": "Täglich · 08:00 — 01:00",
     "contact.reserve": "Tisch reservieren",
+
+    "songs.eyebrow": "Playlist",
+    "songs.title": "Le Patio Jukebox",
+    "songs.subtitle": "Wähle deine Lieblingslieder und füge sie zur Warteschlange des Cafés hinzu.",
+    "songs.searchPlaceholder": "Suche nach einem Song, Künstler...",
+    "songs.queueTitle": "Aktuelle Warteschlange",
+    "songs.emptyQueue": "Die Warteschlange ist leer. Füge den ersten Song hinzu!",
+    "songs.addedToast": "Song zur Warteschlange hinzugefügt!",
   },
 
   it: {
@@ -663,6 +699,7 @@ export const T: Record<Lang, Dict> = {
     "nav.home": "Home",
     "nav.menu": "Menu",
     "nav.explore": "Esplora",
+    "nav.songs": "Canzoni",
     "nav.gallery": "Galleria",
     "nav.events": "Eventi",
     "nav.reviews": "Recensioni",
@@ -814,5 +851,13 @@ export const T: Record<Lang, Dict> = {
     "contact.open": "Aperto",
     "contact.openValue": "Tutti i giorni · 08:00 — 01:00",
     "contact.reserve": "Prenota il tuo tavolo",
+
+    "songs.eyebrow": "Playlist",
+    "songs.title": "Jukebox Le Patio",
+    "songs.subtitle": "Scegli i tuoi brani preferiti e aggiungili alla coda del locale.",
+    "songs.searchPlaceholder": "Cerca una canzone, artista...",
+    "songs.queueTitle": "Coda Attuale",
+    "songs.emptyQueue": "La coda è vuota. Aggiungi la prima canzone!",
+    "songs.addedToast": "Canzone aggiunta alla coda!",
   },
 };
