@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Clef, Clock, Plus, Disc, Loader2, Sparkles } from "lucide-react";
+import { Search, Clock, Plus, Disc, Loader2, Sparkles } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTable } from "@/hooks/useTable";
@@ -17,6 +17,25 @@ import {
 } from "firebase/firestore";
 import { toast } from "sonner";
 import { createServerFn } from "@tanstack/react-start";
+
+// Custom Clé de Sol (Treble Clef) SVG Icon
+function Clef({ className, strokeWidth = 1.5, ...props }: React.ComponentProps<"svg"> & { strokeWidth?: number }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      {...props}
+    >
+      <path d="M12 22V5c0-1.5 1-3 2.5-3S17 3.5 17 5c0 2-3.5 4-5 5.5-2.5 2.5-4.5 4.5-4.5 7s1.8 4 4 4 4-2 4-4.5-1.5-3.5-3.5-3.5c-1 0-2 .5-2.5 1.5" />
+      <circle cx="10.5" cy="21.5" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
 
 // ─── Server-side Deezer search ───────────────────────────────────────────────
 // Deezer blocks browser requests (CORS). The server calls it freely.
