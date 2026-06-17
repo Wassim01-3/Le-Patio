@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Check if user is authenticated admin
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Public settings, menu, events, gallery: anyone can read, only admin can write
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /menu_categories/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /menu_items/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Reviews: Public can read and create, admin can edit/delete
+    match /reviews/{document} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Service requests and Reservations: Public can create, only admin can read/write
+    match /service_requests/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /reservations/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
