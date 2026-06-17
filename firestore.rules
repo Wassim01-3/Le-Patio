@@ -44,5 +44,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
+
+    // Song queue: Public can read and create, admin can edit/delete
+    match /song_queue/{document} {
+      allow read, create: if true;
+      allow update, delete: if isAdmin();
+    }
   }
 }
