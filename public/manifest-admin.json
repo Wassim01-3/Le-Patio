@@ -1,0 +1,17 @@
+{
+  "short_name": "Patio Admin",
+  "name": "Le Patio Dashboard",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/admin",
+  "background_color": "#F5F1E8",
+  "theme_color": "#F5F1E8",
+  "display": "standalone",
+  "orientation": "any"
+}
