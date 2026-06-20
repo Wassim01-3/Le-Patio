@@ -23,6 +23,9 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 
+import { LiveFloorPlan } from "@/components/LiveFloorPlan";
+import { PortraitLandscapeGuard } from "@/components/PortraitLandscapeGuard";
+
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [{ title: "Admin Dashboard — Le Patio" }],
@@ -120,7 +123,7 @@ function AdminLogin() {
 }
 
 function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"requests" | "menu" | "events" | "gallery" | "reviews" | "settings">("requests");
+  const [activeTab, setActiveTab] = useState<"floorplan" | "requests" | "menu" | "events" | "gallery" | "reviews" | "settings">("floorplan");
   
   const handleLogout = async () => {
     await signOut(auth);
@@ -128,6 +131,7 @@ function AdminDashboard() {
   };
 
   const tabs = [
+    { id: "floorplan", label: "Live Floor Plan", icon: Armchair },
     { id: "requests", label: "Requests", icon: Bell },
     { id: "menu", label: "Menu", icon: UtensilsCrossed },
     { id: "events", label: "Events", icon: Calendar },
@@ -178,6 +182,11 @@ function AdminDashboard() {
 
       {/* TAB CONTENTS */}
       <div className="mt-4">
+        {activeTab === "floorplan" && (
+          <PortraitLandscapeGuard>
+            <LiveFloorPlan />
+          </PortraitLandscapeGuard>
+        )}
         {activeTab === "requests" && <RequestsPanel />}
         {activeTab === "menu" && <MenuPanel />}
         {activeTab === "events" && <EventsPanel />}
