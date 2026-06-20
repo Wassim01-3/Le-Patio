@@ -50,5 +50,13 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if isAdmin();
     }
+
+    // Active sessions: Public can write heartbeats, admin can read/delete all
+    match /active_sessions/{sessionId} {
+      // Anyone can write (create/update) their own heartbeat session
+      allow create, update, write: if true;
+      // Admin can read and delete
+      allow read, delete: if isAdmin();
+    }
   }
 }
