@@ -356,7 +356,7 @@ export function LiveFloorPlan() {
 
       {/* Compact floating legend for mobile landscape fullscreen */}
       {isNativeFullscreen && (
-        <div className="absolute top-3 left-3 z-[110] flex items-center gap-3 bg-slate-950/80 border border-border/40 px-3.5 py-1.5 rounded-full backdrop-blur-md select-none">
+        <div className="absolute bottom-3 left-3 z-[110] flex items-center gap-3 bg-slate-950/80 border border-border/40 px-3.5 py-1.5 rounded-full backdrop-blur-md select-none">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             <span className="text-[9px] font-bold text-white uppercase tracking-wider">Live Floor Plan</span>
