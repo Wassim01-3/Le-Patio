@@ -70,14 +70,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "Le Patio" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" },
-      { rel: "manifest", href: "/manifest.json" },
       { rel: "apple-touch-icon", href: "/logo.png" },
     ],
   }),
@@ -88,9 +86,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const isAdmin = router.state.location.pathname.startsWith("/admin");
+
   return (
     <html lang="fr">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+        {isAdmin ? (
+          <>
+            <link rel="manifest" href="/manifest-admin.json" />
+            <meta name="apple-mobile-web-app-title" content="Le Patio Dashboard" />
+          </>
+        ) : (
+          <>
+            <link rel="manifest" href="/manifest.json" />
+            <meta name="apple-mobile-web-app-title" content="Le Patio" />
+          </>
+        )}
+      </head>
       <body>{children}<Scripts /></body>
     </html>
   );
