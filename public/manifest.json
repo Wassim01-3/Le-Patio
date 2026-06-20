@@ -1,0 +1,17 @@
+{
+  "short_name": "Le Patio",
+  "name": "Le Patio — Food & Drinks",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F5F1E8",
+  "theme_color": "#F5F1E8",
+  "display": "standalone",
+  "orientation": "any"
+}
