@@ -66,10 +66,23 @@ export function LiveFloorPlan() {
   // Selected table for popup
   const [selectedTable, setSelectedTable] = useState<TableLayout | null>(null);
 
-  // Edit Mode state
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
   const [newTableId, setNewTableId] = useState("");
+  const [isFullscreenMobile, setIsFullscreenMobile] = useState(false);
+
+  // Detect mobile landscape mode (i.e. width < 1024px and width > height)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const checkFullscreen = () => {
+      const isMobile = window.innerWidth < 1024;
+      const isLandscape = window.innerWidth > window.innerHeight;
+      setIsFullscreenMobile(isMobile && isLandscape);
+    };
+    checkFullscreen();
+    window.addEventListener("resize", checkFullscreen);
+    return () => window.removeEventListener("resize", checkFullscreen);
+  }, []);
 
   // Load layout from Firestore dynamically
   useEffect(() => {
@@ -235,48 +248,80 @@ export function LiveFloorPlan() {
   };
 
   return (
-    <div className="flex flex-col gap-6 select-none">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h3 className="font-display text-2xl font-bold tracking-tight">Live Restaurant Floor Plan</h3>
-          <p className="text-xs text-muted-foreground mt-1">Real-time status control center for Le Patio</p>
+    <div className={`select-none ${
+      isFullscreenMobile 
+        ? "fixed inset-0 z-[100] bg-slate-950 w-screen h-screen p-0 m-0 overflow-hidden flex items-center justify-center" 
+        : "flex flex-col gap-6"
+    }`}>
+      {/* Compact floating legend for mobile landscape fullscreen */}
+      {isFullscreenMobile && (
+        <div className="absolute top-3 left-3 z-[110] flex items-center gap-3 bg-slate-950/80 border border-border/40 px-3.5 py-1.5 rounded-full backdrop-blur-md select-none">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="text-[9px] font-bold text-white uppercase tracking-wider">Live Floor Plan</span>
+          </div>
+          <span className="text-[9px] text-slate-600">|</span>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full border border-border bg-transparent" />
+            <span className="text-[9px] text-slate-300">Free</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/50 border border-emerald-500/90" />
+            <span className="text-[9px] text-slate-300">Occupied</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-500/60 border border-rose-500/90 animate-pulse" />
+            <span className="text-[9px] text-slate-300">Request</span>
+          </div>
+          <span className="text-[9px] text-slate-600">|</span>
+          <span className="text-[8px] text-slate-400">Rotate phone to exit fullscreen</span>
         </div>
+      )}
 
-        {/* Legend / Actions */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <Button
-            onClick={() => {
-              setIsEditMode(!isEditMode);
-              setCurrentPoints([]);
-              setNewTableId("");
-            }}
-            variant="outline"
-            className="rounded-full flex items-center gap-1.5 h-10 text-xs font-semibold"
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-            {isEditMode ? "Exit Editor" : "Edit Table Map"}
-          </Button>
+      {/* Normal Header — hidden in mobile landscape fullscreen */}
+      {!isFullscreenMobile && (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 className="font-display text-2xl font-bold tracking-tight">Live Restaurant Floor Plan</h3>
+            <p className="text-xs text-muted-foreground mt-1">Real-time status control center for Le Patio</p>
+          </div>
 
-          {!isEditMode && (
-            <div className="flex gap-4 items-center bg-card/40 border border-border/80 px-4 py-2.5 rounded-full backdrop-blur-md">
-              <div className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full border border-border bg-transparent" />
-                <span className="text-[11px] font-medium text-muted-foreground">Free</span>
+          {/* Legend / Actions */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <Button
+              onClick={() => {
+                setIsEditMode(!isEditMode);
+                setCurrentPoints([]);
+                setNewTableId("");
+              }}
+              variant="outline"
+              className="rounded-full flex items-center gap-1.5 h-10 text-xs font-semibold"
+            >
+              <Edit2 className="h-3.5 w-3.5" />
+              {isEditMode ? "Exit Editor" : "Edit Table Map"}
+            </Button>
+
+            {!isEditMode && (
+              <div className="flex gap-4 items-center bg-card/40 border border-border/80 px-4 py-2.5 rounded-full backdrop-blur-md">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-full border border-border bg-transparent" />
+                  <span className="text-[11px] font-medium text-muted-foreground">Free</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-3.5 w-3.5 rounded-full bg-emerald-500/50 border border-emerald-500/90" />
+                  <span className="text-[11px] font-medium text-emerald-500">Occupied</span>
+                </div>
+                <div className="flex items-center gap-1.5 animate-pulse">
+                  <span className="h-3.5 w-3.5 rounded-full bg-rose-500/60 border border-rose-500/90" />
+                  <span className="text-[11px] font-medium text-rose-500">Active Request</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 rounded-full bg-emerald-500/50 border border-emerald-500/90" />
-                <span className="text-[11px] font-medium text-emerald-500">Occupied</span>
-              </div>
-              <div className="flex items-center gap-1.5 animate-pulse">
-                <span className="h-3.5 w-3.5 rounded-full bg-rose-500/60 border border-rose-500/90" />
-                <span className="text-[11px] font-medium text-rose-500">Active Request</span>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {isEditMode && (
+      {!isFullscreenMobile && isEditMode && (
         <Card className="p-4 bg-slate-900 border border-accent/20 rounded-3xl grid gap-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -347,120 +392,148 @@ export function LiveFloorPlan() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
         </div>
       ) : (
-        <div className="relative w-full overflow-hidden rounded-[2.5rem] border border-border/60 bg-slate-950 shadow-2xl">
-          {/* Floor Plan Background Image */}
-          <img
-            src={planImage}
-            alt="Le Patio Floor Plan"
-            className="w-full h-auto block opacity-90 transition-opacity"
-          />
-
-          {/* Interactive SVG Layer */}
-          <svg
-            className={`absolute inset-0 w-full h-full ${isEditMode ? "cursor-crosshair" : "cursor-pointer"}`}
-            viewBox="0 0 1665 944"
-            onClick={handleSvgClick}
-          >
-            <defs>
-              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-                <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.06  0 0 0 0 0.73  0 0 0 0 0.50  0 0 0 1 0" result="coloredBlur" />
-                <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
-              <filter id="glow-request" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
-                <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.94  0 0 0 0 0.27  0 0 0 0 0.27  0 0 0 1 0" result="coloredBlur" />
-                <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-              </filter>
-            </defs>
-
-            {/* Saved Polygons */}
-            {tables.map((table) => {
-              const hasRequest = getActiveRequests(table.id).length > 0;
-              const isOccupied = activeTables.has(table.id);
-
-              // Solid, fully opaque fills so they are always visible regardless of background
-              let fillColor = "rgba(0,0,0,0)"; // fully transparent for free
-              let strokeColor = isEditMode ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
-              let strokeWidth = "2";
-              let filter = "";
-              let textFill = isOccupied || hasRequest ? "#ffffff" : "rgba(255,255,255,0.6)";
-              let isAnimated = false;
-
-              if (hasRequest) {
-                fillColor = "rgba(220, 38, 38, 0.55)"; // vivid red, semi-transparent
-                strokeColor = "#ff0000";
-                strokeWidth = "3.5";
-                filter = "url(#glow-request)";
-                textFill = "#ffffff";
-                isAnimated = true;
-              } else if (isOccupied) {
-                fillColor = "rgba(5, 150, 105, 0.50)"; // vivid emerald, semi-transparent
-                strokeColor = "#00ff99";
-                strokeWidth = "3";
-                filter = "url(#glow)";
-                textFill = "#ffffff";
-              }
-
-              return (
-                <g
-                  key={table.id}
-                  onClick={() => !isEditMode && setSelectedTable(table)}
-                  style={{ cursor: isEditMode ? "crosshair" : "pointer" }}
-                >
-                  {/* Hover hit area (invisible, larger) */}
-                  <polygon
-                    points={table.points}
-                    fill="transparent"
-                    stroke="none"
-                    strokeWidth="12"
-                    className="hover:fill-white/10 transition-all duration-200"
-                  />
-                  {/* Actual colored polygon */}
-                  <polygon
-                    points={table.points}
-                    fill={fillColor}
-                    stroke={strokeColor}
-                    strokeWidth={strokeWidth}
-                    strokeLinejoin="round"
-                    filter={filter}
-                    className={isAnimated ? "animate-pulse" : ""}
-                    style={{ pointerEvents: "none" }}
-                  />
-                  {/* Table ID Label */}
-                  <text
-                    x={table.cx}
-                    y={table.cy + 5}
-                    textAnchor="middle"
-                    fill={textFill}
-                    fontSize="14"
-                    fontWeight="900"
-                    stroke={hasRequest ? "#7f0000" : isOccupied ? "#003d26" : "none"}
-                    strokeWidth="3"
-                    paintOrder="stroke fill"
-                    className="pointer-events-none select-none"
-                  >
-                    {table.id}
-                  </text>
-                </g>
-              );
-            })}
-
-            {/* Drawing State: Current Polygon */}
-            {isEditMode && currentPoints.length > 0 && (
-              <g>
-                <polygon
-                  points={currentPoints.map((pt) => `${pt.x},${pt.y}`).join(" ")}
-                  fill="rgba(245, 158, 11, 0.3)"
-                  stroke="#f59e0b"
-                  strokeWidth="2"
+        <div className={isFullscreenMobile 
+          ? "relative flex items-center justify-center w-full h-full p-2" 
+          : "relative w-full overflow-hidden rounded-[2.5rem] border border-border/60 bg-slate-950 shadow-2xl"
+        }>
+          {(() => {
+            const content = (
+              <>
+                {/* Floor Plan Background Image */}
+                <img
+                  src={planImage}
+                  alt="Le Patio Floor Plan"
+                  className={isFullscreenMobile 
+                    ? "w-full h-full object-cover opacity-90" 
+                    : "w-full h-auto block opacity-90 transition-opacity"
+                  }
                 />
-                {currentPoints.map((pt, idx) => (
-                  <circle key={idx} cx={pt.x} cy={pt.y} r="5" fill="#f59e0b" />
-                ))}
-              </g>
-            )}
-          </svg>
+
+                {/* Interactive SVG Layer */}
+                <svg
+                  className={`absolute inset-0 w-full h-full ${isEditMode ? "cursor-crosshair" : "cursor-pointer"}`}
+                  viewBox="0 0 1665 944"
+                  onClick={handleSvgClick}
+                >
+                  <defs>
+                    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.06  0 0 0 0 0.73  0 0 0 0 0.50  0 0 0 1 0" result="coloredBlur" />
+                      <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                    <filter id="glow-request" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.94  0 0 0 0 0.27  0 0 0 0 0.27  0 0 0 1 0" result="coloredBlur" />
+                      <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                  </defs>
+
+                  {/* Saved Polygons */}
+                  {tables.map((table) => {
+                    const hasRequest = getActiveRequests(table.id).length > 0;
+                    const isOccupied = activeTables.has(table.id);
+
+                    // Solid, fully opaque fills so they are always visible regardless of background
+                    let fillColor = "rgba(0,0,0,0)"; // fully transparent for free
+                    let strokeColor = isEditMode ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
+                    let strokeWidth = "2";
+                    let filter = "";
+                    let textFill = isOccupied || hasRequest ? "#ffffff" : "rgba(255,255,255,0.6)";
+                    let isAnimated = false;
+
+                    if (hasRequest) {
+                      fillColor = "rgba(220, 38, 38, 0.55)"; // vivid red, semi-transparent
+                      strokeColor = "#ff0000";
+                      strokeWidth = "3.5";
+                      filter = "url(#glow-request)";
+                      textFill = "#ffffff";
+                      isAnimated = true;
+                    } else if (isOccupied) {
+                      fillColor = "rgba(5, 150, 105, 0.50)"; // vivid emerald, semi-transparent
+                      strokeColor = "#00ff99";
+                      strokeWidth = "3";
+                      filter = "url(#glow)";
+                      textFill = "#ffffff";
+                    }
+
+                    return (
+                      <g
+                        key={table.id}
+                        onClick={() => !isEditMode && setSelectedTable(table)}
+                        style={{ cursor: isEditMode ? "crosshair" : "pointer" }}
+                      >
+                        {/* Hover hit area (invisible, larger) */}
+                        <polygon
+                          points={table.points}
+                          fill="transparent"
+                          stroke="none"
+                          strokeWidth="12"
+                          className="hover:fill-white/10 transition-all duration-200"
+                        />
+                        {/* Actual colored polygon */}
+                        <polygon
+                          points={table.points}
+                          fill={fillColor}
+                          stroke={strokeColor}
+                          strokeWidth={strokeWidth}
+                          strokeLinejoin="round"
+                          filter={filter}
+                          className={isAnimated ? "animate-pulse" : ""}
+                          style={{ pointerEvents: "none" }}
+                        />
+                        {/* Table ID Label */}
+                        <text
+                          x={table.cx}
+                          y={table.cy + 5}
+                          textAnchor="middle"
+                          fill={textFill}
+                          fontSize="14"
+                          fontWeight="900"
+                          stroke={hasRequest ? "#7f0000" : isOccupied ? "#003d26" : "none"}
+                          strokeWidth="3"
+                          paintOrder="stroke fill"
+                          className="pointer-events-none select-none"
+                        >
+                          {table.id}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* Drawing State: Current Polygon */}
+                  {isEditMode && currentPoints.length > 0 && (
+                    <g>
+                      <polygon
+                        points={currentPoints.map((pt) => `${pt.x},${pt.y}`).join(" ")}
+                        fill="rgba(245, 158, 11, 0.3)"
+                        stroke="#f59e0b"
+                        strokeWidth="2"
+                      />
+                      {currentPoints.map((pt, idx) => (
+                        <circle key={idx} cx={pt.x} cy={pt.y} r="5" fill="#f59e0b" />
+                      ))}
+                    </g>
+                  )}
+                </svg>
+              </>
+            );
+
+            if (isFullscreenMobile) {
+              return (
+                <div 
+                  className="relative shadow-2xl border border-border/20 rounded-2xl overflow-hidden"
+                  style={{
+                    width: "calc(min(100vw, 100vh * 1.763) - 16px)",
+                    height: "calc(min(105vh, 100vw / 1.763) - 16px)",
+                  }}
+                >
+                  {content}
+                </div>
+              );
+            }
+
+            return content;
+          })()}
         </div>
       )}
 
@@ -491,12 +564,17 @@ export function LiveFloorPlan() {
 
           return (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              className="fixed inset-x-4 bottom-24 z-50 mx-auto max-w-md md:bottom-28"
+              initial={isFullscreenMobile ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              exit={isFullscreenMobile ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
+              className={isFullscreenMobile
+                ? "fixed top-2 right-2 bottom-2 z-[110] w-[300px] sm:w-[340px] m-0"
+                : "fixed inset-x-4 bottom-24 z-50 mx-auto max-w-md md:bottom-28"
+              }
             >
-              <Card className="glass relative overflow-hidden rounded-[2rem] border border-border/80 p-6 shadow-elegant backdrop-blur-xl">
+              <Card className={`glass relative overflow-hidden rounded-[2rem] border border-border/80 p-5 shadow-elegant backdrop-blur-xl flex flex-col ${
+                isFullscreenMobile ? "h-[calc(100vh-16px)] max-h-[calc(100vh-16px)] overflow-y-auto" : ""
+              }`}>
                 <button
                   onClick={() => setSelectedTable(null)}
                   className="absolute top-4 right-4 p-1.5 rounded-full bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
