@@ -70,18 +70,74 @@ export function LiveFloorPlan() {
   const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([]);
   const [newTableId, setNewTableId] = useState("");
   const [isFullscreenMobile, setIsFullscreenMobile] = useState(false);
+  const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile landscape mode (i.e. width < 1024px and width > height)
+  // Enter/exit standard fullscreen helpers
+  const enterFullscreen = async () => {
+    try {
+      const el = containerRef.current;
+      if (!el) return;
+      if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else if ((el as any).webkitRequestFullscreen) {
+        await (el as any).webkitRequestFullscreen();
+      } else if ((el as any).msRequestFullscreen) {
+        await (el as any).msRequestFullscreen();
+      }
+    } catch (err) {
+      console.error("Error requesting native fullscreen:", err);
+    }
+  };
+
+  const exitFullscreen = async () => {
+    try {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        await (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        await (document as any).msExitFullscreen();
+      }
+    } catch (err) {
+      console.error("Error exiting native fullscreen:", err);
+    }
+  };
+
+  // Detect mobile landscape mode and listen to standard fullscreen change
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const checkFullscreen = () => {
+
+    const checkOrientation = () => {
       const isMobile = window.innerWidth < 1024;
       const isLandscape = window.innerWidth > window.innerHeight;
       setIsFullscreenMobile(isMobile && isLandscape);
+
+      // Auto exit fullscreen if phone is rotated back to portrait
+      const isPortrait = isMobile && window.innerHeight > window.innerWidth;
+      if (isPortrait && (document.fullscreenElement || (document as any).webkitFullscreenElement)) {
+        exitFullscreen();
+      }
     };
-    checkFullscreen();
-    window.addEventListener("resize", checkFullscreen);
-    return () => window.removeEventListener("resize", checkFullscreen);
+
+    const handleFullscreenChange = () => {
+      setIsNativeFullscreen(
+        !!document.fullscreenElement || 
+        !!(document as any).webkitFullscreenElement || 
+        !!(document as any).msFullscreenElement
+      );
+    };
+
+    checkOrientation();
+    window.addEventListener("resize", checkOrientation);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      window.removeEventListener("resize", checkOrientation);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   // Load layout from Firestore dynamically
@@ -248,13 +304,43 @@ export function LiveFloorPlan() {
   };
 
   return (
-    <div className={`select-none ${
-      isFullscreenMobile 
-        ? "fixed inset-0 z-[100] bg-slate-950 w-screen h-screen p-0 m-0 overflow-hidden flex items-center justify-center" 
-        : "flex flex-col gap-6"
-    }`}>
+    <div 
+      ref={containerRef}
+      className={`select-none ${
+        isNativeFullscreen 
+          ? "fixed inset-0 z-[100] bg-slate-950 w-screen h-screen p-0 m-0 overflow-hidden flex items-center justify-center" 
+          : "flex flex-col gap-6"
+      }`}
+    >
+      {/* Fullscreen request overlay on mobile landscape */}
+      {isFullscreenMobile && !isNativeFullscreen && (
+        <div className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-slate-950/95 p-6 text-center select-none backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-xs p-6 bg-card border border-border/80 rounded-[2rem] shadow-elegant flex flex-col items-center gap-4"
+          >
+            <div className="h-12 w-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
+              <Activity className="h-6 w-6" />
+            </div>
+            <h3 className="font-display text-lg font-bold text-foreground">
+              Fullscreen Mode
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Tap below to view the live floor plan in full screen, hiding your browser controls for the best experience.
+            </p>
+            <Button
+              onClick={enterFullscreen}
+              className="w-full bg-accent hover:bg-accent/80 text-wood font-semibold h-11 rounded-full text-xs shadow-gold"
+            >
+              Enter Fullscreen 📺
+            </Button>
+          </motion.div>
+        </div>
+      )}
+
       {/* Compact floating legend for mobile landscape fullscreen */}
-      {isFullscreenMobile && (
+      {isNativeFullscreen && (
         <div className="absolute top-3 left-3 z-[110] flex items-center gap-3 bg-slate-950/80 border border-border/40 px-3.5 py-1.5 rounded-full backdrop-blur-md select-none">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
@@ -274,12 +360,18 @@ export function LiveFloorPlan() {
             <span className="text-[9px] text-slate-300">Request</span>
           </div>
           <span className="text-[9px] text-slate-600">|</span>
-          <span className="text-[8px] text-slate-400">Rotate phone to exit fullscreen</span>
+          <span className="text-[8px] text-slate-400">Rotate phone or tap exit to quit fullscreen</span>
+          <button 
+            onClick={exitFullscreen} 
+            className="ml-2 text-[9px] font-bold text-rose-400 hover:text-rose-300 bg-rose-950/40 border border-rose-500/20 px-2.5 py-0.5 rounded-full"
+          >
+            Exit
+          </button>
         </div>
       )}
 
       {/* Normal Header — hidden in mobile landscape fullscreen */}
-      {!isFullscreenMobile && (
+      {!isNativeFullscreen && (
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 className="font-display text-2xl font-bold tracking-tight">Live Restaurant Floor Plan</h3>
@@ -392,7 +484,7 @@ export function LiveFloorPlan() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
         </div>
       ) : (
-        <div className={isFullscreenMobile 
+        <div className={isNativeFullscreen 
           ? "relative flex items-center justify-center w-full h-full p-2" 
           : "relative w-full overflow-hidden rounded-[2.5rem] border border-border/60 bg-slate-950 shadow-2xl"
         }>
@@ -403,7 +495,7 @@ export function LiveFloorPlan() {
                 <img
                   src={planImage}
                   alt="Le Patio Floor Plan"
-                  className={isFullscreenMobile 
+                  className={isNativeFullscreen 
                     ? "w-full h-full object-cover opacity-90" 
                     : "w-full h-auto block opacity-90 transition-opacity"
                   }
@@ -518,13 +610,13 @@ export function LiveFloorPlan() {
               </>
             );
 
-            if (isFullscreenMobile) {
+            if (isNativeFullscreen) {
               return (
                 <div 
                   className="relative shadow-2xl border border-border/20 rounded-2xl overflow-hidden"
                   style={{
                     width: "calc(min(100vw, 100vh * 1.763) - 16px)",
-                    height: "calc(min(105vh, 100vw / 1.763) - 16px)",
+                    height: "calc(min(100vh, 100vw / 1.763) - 16px)",
                   }}
                 >
                   {content}
@@ -564,16 +656,16 @@ export function LiveFloorPlan() {
 
           return (
             <motion.div
-              initial={isFullscreenMobile ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
+              initial={isNativeFullscreen ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
-              exit={isFullscreenMobile ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
-              className={isFullscreenMobile
+              exit={isNativeFullscreen ? { opacity: 0, x: 50, y: 0 } : { opacity: 0, y: 30, x: 0 }}
+              className={isNativeFullscreen
                 ? "fixed top-2 right-2 bottom-2 z-[110] w-[300px] sm:w-[340px] m-0"
                 : "fixed inset-x-4 bottom-24 z-50 mx-auto max-w-md md:bottom-28"
               }
             >
               <Card className={`glass relative overflow-hidden rounded-[2rem] border border-border/80 p-5 shadow-elegant backdrop-blur-xl flex flex-col ${
-                isFullscreenMobile ? "h-[calc(100vh-16px)] max-h-[calc(100vh-16px)] overflow-y-auto" : ""
+                isNativeFullscreen ? "h-[calc(100vh-16px)] max-h-[calc(100vh-16px)] overflow-y-auto" : ""
               }`}>
                 <button
                   onClick={() => setSelectedTable(null)}
