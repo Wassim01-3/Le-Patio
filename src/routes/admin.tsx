@@ -30,10 +30,6 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin Dashboard — Le Patio" },
-      { name: "apple-mobile-web-app-title", content: "Le Patio Dashboard" },
-    ],
-    links: [
-      { rel: "manifest", href: "/manifest-admin.json" },
     ],
   }),
   component: AdminRoute,
