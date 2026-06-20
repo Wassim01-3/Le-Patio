@@ -73,20 +73,24 @@ export function LiveFloorPlan() {
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Enter/exit standard fullscreen helpers
+  // Enter/exit standard fullscreen helpers with fallback
   const enterFullscreen = async () => {
     try {
-      const el = containerRef.current;
-      if (!el) return;
+      const el = document.documentElement; // Request fullscreen on the document root
       if (el.requestFullscreen) {
         await el.requestFullscreen();
       } else if ((el as any).webkitRequestFullscreen) {
         await (el as any).webkitRequestFullscreen();
       } else if ((el as any).msRequestFullscreen) {
         await (el as any).msRequestFullscreen();
+      } else {
+        // Fallback for iOS Safari (iPhone) where Fullscreen API on elements is not supported
+        setIsNativeFullscreen(true);
       }
     } catch (err) {
       console.error("Error requesting native fullscreen:", err);
+      // Fallback on security block or other errors
+      setIsNativeFullscreen(true);
     }
   };
 
@@ -98,9 +102,12 @@ export function LiveFloorPlan() {
         await (document as any).webkitExitFullscreen();
       } else if ((document as any).msExitFullscreen) {
         await (document as any).msExitFullscreen();
+      } else {
+        setIsNativeFullscreen(false);
       }
     } catch (err) {
       console.error("Error exiting native fullscreen:", err);
+      setIsNativeFullscreen(false);
     }
   };
 
@@ -115,17 +122,25 @@ export function LiveFloorPlan() {
 
       // Auto exit fullscreen if phone is rotated back to portrait
       const isPortrait = isMobile && window.innerHeight > window.innerWidth;
-      if (isPortrait && (document.fullscreenElement || (document as any).webkitFullscreenElement)) {
+      if (isPortrait) {
         exitFullscreen();
       }
     };
 
     const handleFullscreenChange = () => {
-      setIsNativeFullscreen(
+      const isCurrentlyFullscreen = 
         !!document.fullscreenElement || 
         !!(document as any).webkitFullscreenElement || 
-        !!(document as any).msFullscreenElement
-      );
+        !!(document as any).msFullscreenElement;
+      
+      // Only update state via listener if standard Fullscreen API is active
+      if (
+        document.fullscreenEnabled || 
+        (document as any).webkitFullscreenEnabled || 
+        (document as any).msFullscreenEnabled
+      ) {
+        setIsNativeFullscreen(isCurrentlyFullscreen);
+      }
     };
 
     checkOrientation();
